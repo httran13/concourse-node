@@ -7,4 +7,4 @@ image_resource:
 
 run:
   path: echo
-  args: ['Hello from huy pipeline']
+  args: ['Hello from huy pipeline this is triggered!']
