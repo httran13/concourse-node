@@ -4,4 +4,4 @@ echo "hello from concourse node example"
 
 echo "running test"
 
-cd ../.. && mocha
+cd ../.. && npm test
