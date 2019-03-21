@@ -43,12 +43,14 @@ describe('Test users', function(){
   /**
    *  Tests for added functionalities
    * **/
-  it('#Test the new feature', function(done){
+  it.skip('#Test the new feature', function(done){
     request(app)
-        .get('/users/newfeature')
+        .post('/users/newfeature')
+        .send({user:"huy"})
         .expect(200)
         .end(function(err, res){
           console.log("item res", res.data)
+
           done();
         })
   })

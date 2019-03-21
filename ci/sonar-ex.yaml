@@ -1,0 +1,101 @@
+resource_types:
+
+  - name: sonar-runner
+    type: docker-image
+    source:
+      repository: cathive/concourse-sonarqube-resource
+      tag: latest # For reproducible builds use a specific tag and don't rely on "latest".
+
+resources:
+
+  - name: sources
+    type: git
+    source:
+      uri: https://github.com/example/example.git
+
+  - name: artifact
+    type: s3
+    # ... configuration ommited
+
+  - name: code-analysis
+    type: sonar-runner
+    source:
+      host_url: https://sonarqube.example.com/
+      login: ((sonarqube-auth-token))
+      project_key: com.example.my_project
+
+jobs:
+
+  # The build job performs fetches stuff from the "sources" resource
+  # and executes a task that builds and tests everyhing. Once compilation,
+  # test execution and <whatever> has been performed, we copy the whole
+  # working directory into the output folder "sonarqube-analysis-input"
+  # and push the package that has been created by the "build" task to the
+  # artifact resource and utilize the sonarqube-resource to perform static
+  # code analysis.
+  - name: build-and-analyze
+    plan:
+      - get: sources
+        trigger: true
+      - task: build
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: debian
+              tag: 'jessie'
+          inputs:
+            - name: sources
+          outputs:
+            # Hint: The sonar-runner needs more than just the
+            # sources to perform a full analysis. Line coverage reports, unit test reports,
+            # Java class files and mutation test results should also be present.
+            # Therefore, you'll have to make sure that your build script provides the sources
+            # and the compilation/test results in your Concourse CI build plan.
+            # (And that is the reason, why we need the following output)
+            - name: sonarqube-analysis-input
+          run:
+            path: build.sh
+            dir: sources
+      - aggregate:
+          - put: code-analysis
+            params:
+              project_path: sonarqube-analysis-input
+              additional_properties:
+                # Will be passed as "-Dsonar.javascript.lcov.reportPaths="coverage/lcov.info" to the scanner.
+                sonar.javascript.lcov.reportPaths: coverage/lcov.info
+          - put: artifact
+
+  # The qualitygate task breaks the build if the analysis result from SonarQube
+  # indicates that any of our quality metrics have not been met.
+  - name: qualitygate
+    plan:
+      - aggregate:
+          - get: artifact
+            passed:
+              - build-and-analyze
+          - get: code-analysis
+            passed:
+              - build-and-analyze
+            trigger: true
+      - task: check-sonarqube-quality-gate
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: cathive/concourse-sonarqube-qualitygate-task
+              tag: latest # Use one of the versioned tags for reproducible builds!
+          inputs:
+            - name: code-analysis
+          run:
+            path: /sonarqube-qualitygate-check
+            dir: code-analysis
+
+  # We deploy only artifacts that have made it through our quality gate!
+  - name: deploy
+    plan:
+      - get: artifact
+        passed:
+          - qualitygate

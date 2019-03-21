@@ -15,8 +15,9 @@ router.get('/check/:name', function(req, res, next){
 });
 
 // Adding new feature
-router.get('/newfeature', function(req, res, next){
-  console.log("In new feature")
+router.post('/newfeature', function(req, res, next){
+  let body = req.body
+  console.log("In new feature;",body)
   res.send(users.newFeature())
 });
 

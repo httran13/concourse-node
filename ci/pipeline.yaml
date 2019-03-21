@@ -1,10 +1,122 @@
 ---
-platform: linux
+resource_types:
+  - name: npm-cache
+    type: docker-image
+    source: {repository: ymedlop/npm-cache-resource, tag: "8"}
+  - name: sonar-runner
+    type: docker-image
+    source: {repository: cathive/concourse-sonarqube-resource, tag: "0.8.1" }
+resources:
+  - name: code-analysis
+    type: sonar-runner
+    source:
+      host_url: "https://sonarcloud.io/"
+      #      __debug: true
+      login: ((sonar-token))
+      organization: httran13-github
+  - name: fabric-api-master
+    type: git
+    source: &repo-souce
+      branch: dev
+      uri: https://httran13:((git-node-ex-token))@github.com/httran13/concourse-node.git
+  - name: fabric-api-master
+    type: git
+    source: &repo-souce
+      branch: master
+      uri: https://httran13:((git-node-ex-token))@github.com/httran13/concourse-node.git
+  - name: npm-repo-cache
+    type: npm-cache
+    source:
+      yarn-support: true
+      <<: *repo-souce
+      paths:
+        - package.json
+jobs:
+  - name: cache
+    plan:
+      - get: fabric-api-dev
+        trigger: true
+      - get: npm-repo-cache
+  - name: test
+    serial: true
+    plan:
+      - get: fabric-api-dev
+        trigger: true
+        passed: [cache]
+      - get: npm-repo-cache
+        passed: [cache]
+      - task: npm-install
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image #TODO env should reflect what is built by docker image
+            source: {repository: yeasy/hyperledger-fabric-sdk-node, tag: "latest"}
+          inputs:
+            - name: fabric-api-dev
+              path: /src
+            - name: npm-repo-cache
+              path: /cache
+          outputs:
+            - name: sonarqube-analysis-input
+          params: #TODO modify env
+            ENVIRONMENT: local
+            PORT: 3000
+            FABRIC_LOCAL_CP: "cp.json"
+            FABRIC_DOCKER_CP: "cp-docker.json"
+          run:
+            path: sh
+            args:
+              - -exc
+              - |
+                mv cache/node_modules src
+                cd src
+                npm rebuild
+                npm test
+                perl -i -pe's|SF:.*/src/|SF:/tmp/build/put/sonarqube-analysis-input/|g' coverage/lcov.info
+                cp -r . ../sonarqube-analysis-input
+      - aggregate:
+          - put: code-analysis
+            params:
+              project_path: sonarqube-analysis-input
+              project_key: "huy:huyfab"
+              sources: ["."]
+              scanner_type: auto
+              project_name: huyfirstscan
+              project_description: "my first scanner"
+              project_version: 0.0.1
+              branch_name: master
+              tests: ["test"]
+              additional_properties:
+                #                sonar.inclusions: ["./api","./bin","./config","./public","./views"]
+                sonar.test.inclusions: ["test/**"]
+                sonar.exclusions: ["**/node_modules/**","**/coverage/lcov-report/**"]
+                sonar.language: js
+                sonar.scm.provider: git
+                sonar.javascript.lcov.reportPaths: coverage/lcov.info
+  #          - put: artifact
+  ##            params:
+  ##              file: huy/put/test.zip
 
-image_resource:
-  type: docker-image
-  source: {repository: busybox}
-
-run:
-  path: echo
-  args: ['Hello from huy pipeline this is triggered!']
+  - name: qualitygate
+    plan:
+      - aggregate:
+          #          - get: artifact
+          #            passed:
+          #              - test
+          - get: code-analysis
+            passed:
+              - test
+            trigger: true
+      - task: check-sonarqube-quality-gate
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: cathive/concourse-sonarqube-qualitygate-task
+              tag: latest
+          inputs:
+            - name: code-analysis
+          run:
+            path: /sonarqube-qualitygate-check
+            dir: code-analysis

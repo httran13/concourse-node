@@ -35,12 +35,12 @@ function newFeature(){
     str2 = str2 + (b * i)
   }
 
-  uselessFcn();
+  someUseFulNewFunc();
   return {str1 : str1, str2: str2}
 }
 
-function uselessFcn(){
-  console.log("Doing something useless here")
+function someUseFulNewFunc(){
+  console.log("Doing something super genius here")
   let a = 4
   let b = 9
   let c = a + b
