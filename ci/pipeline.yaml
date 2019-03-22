@@ -84,7 +84,7 @@ jobs:
             params:
               project_path: sonarqube-analysis-input
               project_key: "github.com:httran13:node-concourse-demo"
-              sources: ["."]
+              sources: ["src/**", "app.js"]
               scanner_type: auto
               project_name: node-concourse-demo
               project_description: "Example node demo"
