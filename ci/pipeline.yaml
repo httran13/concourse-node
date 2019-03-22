@@ -14,11 +14,11 @@ resources:
       __debug: true
       login: ((sonar-token))
       organization: httran13-github
-#  - name: fabric-api-dev
-#    type: git
-#    source: &repo-souce
-#      branch: dev
-#      uri: https://httran13:((github-token))@github.com/httran13/concourse-node.git
+  - name: git-master
+    type: git
+    source:
+      branch: master
+      uri: https://httran13:((github-token))@github.com/httran13/concourse-node.git
   - name: git-dev
     type: git
     source: &repo-source
@@ -93,9 +93,6 @@ jobs:
               branch_target: master
               tests: ["tests"]
               additional_properties:
-#                sonar.test.exclusions: ["tests/*"]
-#                sonar.exclusions: ["node_modules/**/*","tests/*"]
-#                sonar.inclusions: ["src/routes/index.js", "app.js"]
                 sonar.language: js
                 sonar.scm.provider: git
                 sonar.javascript.lcov.reportPaths: coverage/lcov.info
@@ -110,6 +107,7 @@ jobs:
             passed:
               - test
             trigger: true
+
       - task: check-sonarqube-quality-gate
         config:
           platform: linux
@@ -120,6 +118,11 @@ jobs:
               tag: latest
           inputs:
             - name: code-analysis
+          outputs:
+            - name: master-branch
           run:
             path: /sonarqube-qualitygate-check
             dir: code-analysis
+      - put: git-master
+        params:
+          repository: master-branch
