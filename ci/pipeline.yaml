@@ -84,7 +84,7 @@ jobs:
             params:
               project_path: sonarqube-analysis-input
               project_key: "github.com:httran13:node-concourse-demo"
-              sources: ["."]
+              sources: ["src", "app.js"]
               scanner_type: auto
               project_name: node-concourse-demo
               project_description: "Example node demo"
@@ -93,9 +93,9 @@ jobs:
 #              branch_target: branch-sprint1
               tests: ["tests"]
               additional_properties:
-                sonar.test.exclusions: ["tests/*"]
-                sonar.exclusions: ["node_modules/**/*","coverage/lcov-report/**/*","tests/*"]
-                sonar.inclusions: ["src/", "app.js"]
+#                sonar.test.exclusions: ["tests/*"]
+#                sonar.exclusions: ["node_modules/**/*","tests/*"]
+#                sonar.inclusions: ["src/routes/index.js", "app.js"]
                 sonar.language: js
                 sonar.scm.provider: git
                 sonar.javascript.lcov.reportPaths: coverage/lcov.info
