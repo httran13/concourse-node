@@ -94,7 +94,7 @@ jobs:
               tests: ["tests"]
               additional_properties:
                 sonar.test.inclusions: ["tests/**"]
-                sonar.exclusions: ["**/node_modules/**","**/coverage/lcov-report/**", "**/tests/**"]
+                sonar.exclusions: ["**/node_modules/**","**/coverage/lcov-report/**"]
                 sonar.language: js
                 sonar.scm.provider: git
                 sonar.javascript.lcov.reportPaths: coverage/lcov.info
