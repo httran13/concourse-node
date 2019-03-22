@@ -84,14 +84,14 @@ jobs:
             params:
               project_path: sonarqube-analysis-input
               project_key: "github.com:httran13:node-concourse-demo"
-              sources: ["src/**/*", "app.js"]
+              sources: ["src", "app.js"]
               scanner_type: auto
               project_name: node-concourse-demo
               project_description: "Example node demo"
               project_version: 0.0.1
               branch_name: dev
 #              branch_target: branch-sprint1
-              tests: ["tests/*"]
+              tests: ["tests"]
               additional_properties:
 #                sonar.test.exclusions: ["tests/*"]
 #                sonar.exclusions: ["node_modules/**/*","coverage/lcov-report/**/*","tests/*"]
