@@ -58,7 +58,7 @@ jobs:
             source: {repository: yeasy/hyperledger-fabric-sdk-node, tag: "latest"}
           inputs:
             - name: git-dev
-              path: /src
+              path: /node-concourse
             - name: npm-repo-cache
               path: /cache
           outputs:
@@ -73,11 +73,11 @@ jobs:
             args:
               - -exc
               - |
-                mv cache/node_modules src
-                cd src
+                mv cache/node_modules node-concourse
+                cd node-concourse
                 npm rebuild
                 npm test
-                perl -i -pe's|SF:.*/src/|SF:/tmp/build/put/sonarqube-analysis-input/|g' coverage/lcov.info
+                perl -i -pe's|SF:.*/node-concourse/|SF:/tmp/build/put/sonarqube-analysis-input/|g' coverage/lcov.info
                 cp -r . ../sonarqube-analysis-input
       - aggregate:
           - put: code-analysis
