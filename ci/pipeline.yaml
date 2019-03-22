@@ -90,7 +90,7 @@ jobs:
               project_description: "Example node demo"
               project_version: 0.0.1
               branch_name: dev
-              branch_target: branch-sprint1
+#              branch_target: branch-sprint1
               tests: ["tests"]
               additional_properties:
 #                sonar.test.inclusions: ["tests/**"]
