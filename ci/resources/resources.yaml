@@ -1,0 +1,37 @@
+resource_types:
+  - name: npm-cache
+    type: docker-image
+    source: {repository: ymedlop/npm-cache-resource, tag: "8"}
+  - name: sonar-runner
+    type: docker-image
+    source: {repository: cathive/concourse-sonarqube-resource, tag: "0.8.1" }
+resources:
+  - name: code-analysis
+    type: sonar-runner
+    source:
+      host_url: "https://sonarcloud.io/"
+      #      __debug: true
+      login: ((sonar-token))
+      organization: httran13-github
+  - name: fabric-api-dev
+    type: git
+    source: &repo-souce
+      branch: dev
+      uri: https://httran13:((github-token))@github.com/httran13/concourse-node.git
+  - name: fabric-api-master
+    type: git
+    source: &repo-souce
+      branch: master
+      uri: https://httran13:((github-token))@github.com/httran13/concourse-node.git
+  - name: fabric-api-newfeature
+    type: git
+    source: &repo-souce
+      branch: feature/new
+      uri: https://httran13:((github-token))@github.com/httran13/concourse-node.git
+  - name: npm-repo-cache
+    type: npm-cache
+    source:
+      yarn-support: true
+      <<: *repo-souce
+      paths:
+        - package.json

@@ -11,40 +11,45 @@ resources:
     type: sonar-runner
     source:
       host_url: "https://sonarcloud.io/"
-      #      __debug: true
+      __debug: true
       login: ((sonar-token))
       organization: httran13-github
-  - name: fabric-api-master
+#  - name: fabric-api-dev
+#    type: git
+#    source: &repo-souce
+#      branch: dev
+#      uri: https://httran13:((github-token))@github.com/httran13/concourse-node.git
+  - name: git-dev
     type: git
-    source: &repo-souce
+    source: &repo-source
       branch: dev
-      uri: https://httran13:((git-node-ex-token))@github.com/httran13/concourse-node.git
-  - name: fabric-api-master
-    type: git
-    source: &repo-souce
-      branch: master
-      uri: https://httran13:((git-node-ex-token))@github.com/httran13/concourse-node.git
+      uri: https://httran13:((github-token))@github.com/httran13/concourse-node.git
+#  - name: fabric-api-newfeature
+#    type: git
+#    source: &repo-souce
+#      branch: feature/new
+#      uri: https://httran13:((github-token))@github.com/httran13/concourse-node.git
   - name: npm-repo-cache
     type: npm-cache
     source:
       yarn-support: true
-      <<: *repo-souce
+      <<: *repo-source
       paths:
         - package.json
 jobs:
-  - name: cache
+  - name: build
     plan:
-      - get: fabric-api-dev
+      - get: git-dev
         trigger: true
       - get: npm-repo-cache
   - name: test
     serial: true
     plan:
-      - get: fabric-api-dev
+      - get: git-dev
         trigger: true
-        passed: [cache]
+        passed: [build]
       - get: npm-repo-cache
-        passed: [cache]
+        passed: [build]
       - task: npm-install
         config:
           platform: linux
@@ -52,17 +57,17 @@ jobs:
             type: docker-image #TODO env should reflect what is built by docker image
             source: {repository: yeasy/hyperledger-fabric-sdk-node, tag: "latest"}
           inputs:
-            - name: fabric-api-dev
+            - name: git-dev
               path: /src
             - name: npm-repo-cache
               path: /cache
           outputs:
             - name: sonarqube-analysis-input
-          params: #TODO modify env
-            ENVIRONMENT: local
-            PORT: 3000
-            FABRIC_LOCAL_CP: "cp.json"
-            FABRIC_DOCKER_CP: "cp-docker.json"
+#          params: #TODO modify env
+#            ENVIRONMENT: local
+#            PORT: 3000
+#            FABRIC_LOCAL_CP: "cp.json"
+#            FABRIC_DOCKER_CP: "cp-docker.json"
           run:
             path: sh
             args:
@@ -78,18 +83,18 @@ jobs:
           - put: code-analysis
             params:
               project_path: sonarqube-analysis-input
-              project_key: "huy:huyfab"
+              project_key: "github.com:httran13:node-concourse-demo"
               sources: ["."]
               scanner_type: auto
-              project_name: huyfirstscan
-              project_description: "my first scanner"
+              project_name: node-concourse-demo
+              project_description: "Example node demo"
               project_version: 0.0.1
-              branch_name: master
-              tests: ["test"]
+              branch_name: dev
+              branch_target: branch-sprint1
+              tests: ["tests"]
               additional_properties:
-                #                sonar.inclusions: ["./api","./bin","./config","./public","./views"]
-                sonar.test.inclusions: ["test/**"]
-                sonar.exclusions: ["**/node_modules/**","**/coverage/lcov-report/**"]
+#                sonar.test.inclusions: ["tests/**"]
+                sonar.exclusions: ["**/node_modules/**","**/coverage/lcov-report/**", "**/tests/**"]
                 sonar.language: js
                 sonar.scm.provider: git
                 sonar.javascript.lcov.reportPaths: coverage/lcov.info
@@ -100,9 +105,6 @@ jobs:
   - name: qualitygate
     plan:
       - aggregate:
-          #          - get: artifact
-          #            passed:
-          #              - test
           - get: code-analysis
             passed:
               - test
