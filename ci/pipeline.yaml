@@ -90,26 +90,19 @@ jobs:
               project_description: "Example node demo"
               project_version: 0.0.1
               branch_name: dev
-              branch_target: master
               tests: ["tests"]
               additional_properties:
                 sonar.language: js
                 sonar.scm.provider: git
                 sonar.javascript.lcov.reportPaths: coverage/lcov.info
-  #          - put: artifact
-  ##            params:
-  ##              file: huy/put/test.zip
-
-  - name: qualitygate
+  - name: dev-quality-gate
     plan:
       - aggregate:
           - get: code-analysis
             passed:
               - test
             trigger: true
-#          - get: git-dev
-#          - get: git-master
-
+          - get: npm-repo-cache
       - task: check-sonarqube-quality-gate
         config:
           platform: linux
@@ -132,33 +125,43 @@ jobs:
             - put: git-master
               params:
                 repository: git-dev
-#  - name: Merge-to-master
-#    plan:
-#      - get: git-dev
-#        passed: [test]
-#      - get: code-analysis
-#        passed: [qualitygate]
-#        trigger: true
-#      - task: commit-and-push
-#        config:
-#          inputs:
-#            - name: git-dev
-#          outputs:
-#            - name: git-master-branch
-#          platform: linux
-#          image_resource:
-#            type: docker-image
-#            source:
-#              repository: node
-#              tag: 8.0.0
-#          run:
-#            path: bash
-#            args:
-#              - -exc
-#              - git clone git-dev
-#              - git checkout master
-#              - git merge dev
-#              -
-#      - put: git-master
-#        params:
-#          repository: git-master-branch
+      - task: run-code-coverage
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: { repository: yeasy/hyperledger-fabric-sdk-node, tag: "latest" }
+          inputs:
+            - name: git-master
+              path: /node-concourse
+            - name: npm-repo-cache
+              path: /cache
+          outputs:
+            - name: sonarqube-analysis-input
+          run:
+            path: sh
+            args:
+              - -exc
+              - |
+                mv cache/node_modules node-concourse
+                cd node-concourse
+                npm rebuild
+                npm test
+                perl -i -pe's|SF:.*/node-concourse/|SF:/tmp/build/put/sonarqube-analysis-input/|g' coverage/lcov.info
+                cp -r . ../sonarqube-analysis-input
+      - aggregate:
+          - put: code-analysis
+            params:
+              project_path: sonarqube-analysis-input
+              project_key: "github.com:httran13:node-concourse-demo"
+              sources: ["src", "app.js"]
+              scanner_type: auto
+              project_name: node-concourse-demo
+              project_description: "Example node demo"
+              project_version: 0.0.1
+              branch_name: master
+              tests: ["tests"]
+              additional_properties:
+                sonar.language: js
+                sonar.scm.provider: git
+                sonar.javascript.lcov.reportPaths: coverage/lcov.info
