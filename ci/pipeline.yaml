@@ -107,6 +107,8 @@ jobs:
             passed:
               - test
             trigger: true
+#          - get: git-dev
+#          - get: git-master
 
       - task: check-sonarqube-quality-gate
         config:
@@ -123,33 +125,40 @@ jobs:
           run:
             path: /sonarqube-qualitygate-check
             dir: code-analysis
-  - name: Merge-to-master
-    plan:
-      - get: git-dev
-        passed: [test]
-      - get: code-analysis
-        passed: [qualitygate]
-      - task: commit-and-push
-        config:
-          inputs:
-            - name: git-dev
-          outputs:
-            - name: git-master-branch
-          platform: linux
-          image_resource:
-            type: docker-image
-            source:
-              repository: node
-              tag: 8.0.0
-          run:
-            path: bash
-            args:
-              - -exc
-              - git clone git-dev git-master-branch
-              - cd git-master-branch
-              - echo $(date) > huy_add.txt
-              - git add .
-              - git commit -m "adding from pipeline"
-      - put: git-master
-        params:
-          repository: git-master-branch
+        on_success:
+          do:
+            - get: git-dev
+            - get: git-master
+            - put: git-master
+              params:
+                repository: git-dev
+#  - name: Merge-to-master
+#    plan:
+#      - get: git-dev
+#        passed: [test]
+#      - get: code-analysis
+#        passed: [qualitygate]
+#        trigger: true
+#      - task: commit-and-push
+#        config:
+#          inputs:
+#            - name: git-dev
+#          outputs:
+#            - name: git-master-branch
+#          platform: linux
+#          image_resource:
+#            type: docker-image
+#            source:
+#              repository: node
+#              tag: 8.0.0
+#          run:
+#            path: bash
+#            args:
+#              - -exc
+#              - git clone git-dev
+#              - git checkout master
+#              - git merge dev
+#              -
+#      - put: git-master
+#        params:
+#          repository: git-master-branch
