@@ -95,7 +95,7 @@ jobs:
               additional_properties:
                 sonar.test.exclusions: ["tests/*"]
                 sonar.exclusions: ["node_modules/**/*","coverage/lcov-report/**/*","tests/*"]
-                sonar.inclusions: ["src/**/*", "app.js"]
+                sonar.inclusions: ["src/", "app.js"]
                 sonar.language: js
                 sonar.scm.provider: git
                 sonar.javascript.lcov.reportPaths: coverage/lcov.info
