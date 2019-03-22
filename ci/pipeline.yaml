@@ -93,8 +93,8 @@ jobs:
 #              branch_target: branch-sprint1
               tests: ["tests"]
               additional_properties:
-                sonar.test.inclusions: ["tests/**"]
-                sonar.exclusions: ["**/node_modules/**","**/coverage/lcov-report/**"]
+                sonar.test.inclusions: ["**/tests/**"]
+                sonar.exclusions: ["**/node_modules/**","**/coverage/lcov-report/**","**/tests/**"]
                 sonar.language: js
                 sonar.scm.provider: git
                 sonar.javascript.lcov.reportPaths: coverage/lcov.info
