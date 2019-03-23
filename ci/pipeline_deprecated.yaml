@@ -1,6 +1,43 @@
 ---
+resource_types:
+  - name: npm-cache
+    type: docker-image
+    source: {repository: ymedlop/npm-cache-resource, tag: "8"}
+  - name: sonar-runner
+    type: docker-image
+    source: {repository: cathive/concourse-sonarqube-resource, tag: "0.8.1" }
+resources:
+  - name: code-analysis
+    type: sonar-runner
+    source:
+      host_url: "https://sonarcloud.io/"
+#      __debug: true
+      login: ((sonar-token))
+      organization: httran13-github
+  - name: git-master
+    type: git
+    source:
+      branch: master
+      uri: https://httran13:((github-token))@github.com/httran13/concourse-node.git
+  - name: git-dev
+    type: git
+    source: &repo-source
+      branch: dev
+      uri: https://httran13:((github-token))@github.com/httran13/concourse-node.git
+#  - name: fabric-api-newfeature
+#    type: git
+#    source: &repo-souce
+#      branch: feature/new
+#      uri: https://httran13:((github-token))@github.com/httran13/concourse-node.git
+  - name: npm-repo-cache
+    type: npm-cache
+    source:
+      yarn-support: true
+      <<: *repo-source
+      paths:
+        - package.json
 jobs:
-  - name: cache-modules
+  - name: build
     plan:
       - get: git-dev
         trigger: true
@@ -8,38 +45,40 @@ jobs:
   - name: test
     serial: true
     plan:
-      - get: dev-branch
-        resource: git-dev
+      - get: git-dev
         trigger: true
-        passed: [cache-modules]
-      - get: node-cache
-        resource: npm-repo-cache
-        passed: [cache-modules]
-      - task: test
-        file: git-dev/ci/tasks/task-npm-install.yml
-#        config:
-#          platform: linux
-#          image_resource:
-#            type: docker-image #TODO env should reflect what is built by docker image
-#            source: {repository: yeasy/hyperledger-fabric-sdk-node, tag: "latest"}
-#          inputs:
-#            - name: git-dev
-#              path: /node-concourse
-#            - name: npm-repo-cache
-#              path: /cache
-#          outputs:
-#            - name: sonarqube-analysis-input
-#          run:
-#            path: sh
-#            args:
-#              - -exc
-#              - |
-#                mv cache/node_modules node-concourse
-#                cd node-concourse
-#                npm rebuild
-#                npm test
-#                perl -i -pe's|SF:.*/node-concourse/|SF:/tmp/build/put/sonarqube-analysis-input/|g' coverage/lcov.info
-#                cp -r . ../sonarqube-analysis-input
+        passed: [build]
+      - get: npm-repo-cache
+        passed: [build]
+      - task: npm-install
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image #TODO env should reflect what is built by docker image
+            source: {repository: yeasy/hyperledger-fabric-sdk-node, tag: "latest"}
+          inputs:
+            - name: git-dev
+              path: /node-concourse
+            - name: npm-repo-cache
+              path: /cache
+          outputs:
+            - name: sonarqube-analysis-input
+#          params: #TODO modify env
+#            ENVIRONMENT: local
+#            PORT: 3000
+#            FABRIC_LOCAL_CP: "cp.json"
+#            FABRIC_DOCKER_CP: "cp-docker.json"
+          run:
+            path: sh
+            args:
+              - -exc
+              - |
+                mv cache/node_modules node-concourse
+                cd node-concourse
+                npm rebuild
+                npm test
+                perl -i -pe's|SF:.*/node-concourse/|SF:/tmp/build/put/sonarqube-analysis-input/|g' coverage/lcov.info
+                cp -r . ../sonarqube-analysis-input
       - aggregate:
           - put: code-analysis
             params:
@@ -127,35 +166,3 @@ jobs:
                 sonar.scm.provider: git
                 sonar.javascript.lcov.reportPaths: coverage/lcov.info
                 ##test
-resource_types:
-  - name: npm-cache
-    type: docker-image
-    source: {repository: ymedlop/npm-cache-resource, tag: "8"}
-  - name: sonar-runner
-    type: docker-image
-    source: {repository: cathive/concourse-sonarqube-resource, tag: "0.8.1" }
-resources:
-  - name: code-analysis
-    type: sonar-runner
-    source:
-      host_url: "https://sonarcloud.io/"
-      #      __debug: true
-      login: ((sonar-token))
-      organization: httran13-github
-  - name: git-master
-    type: git
-    source:
-      branch: master
-      uri: https://httran13:((github-token))@github.com/httran13/concourse-node.git
-  - name: git-dev
-    type: git
-    source: &repo-source
-      branch: dev
-      uri: https://httran13:((github-token))@github.com/httran13/concourse-node.git
-  - name: npm-repo-cache
-    type: npm-cache
-    source:
-      yarn-support: true
-      <<: *repo-source
-      paths:
-        - package.json
