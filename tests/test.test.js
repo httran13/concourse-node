@@ -18,8 +18,8 @@ describe('Test users', function(){
   it('#Test for name check', function(done){
     request(app)
         .get('/users/check/not7')
-        .expect('AAA',done)
-        // .expect(200, done)
+        // .expect('AAA',done)
+        .expect(200, done)
   })
 
   it("#Test for name check return false", function(done){
