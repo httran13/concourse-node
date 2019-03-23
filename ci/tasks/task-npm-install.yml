@@ -6,8 +6,8 @@ image_resource:
   source: {repository: yeasy/hyperledger-fabric-sdk-node, tag: "latest"}
 
 inputs:
-  - name: git-dev
-  - name: npm-repo-cache
+  - name: dev-branch
+  - name: node-cache
 outputs:
   - name: sonarqube-analysis-input
 
