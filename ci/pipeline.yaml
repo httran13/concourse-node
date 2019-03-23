@@ -8,15 +8,10 @@ jobs:
   - name: test
     serial: true
     plan:
-      - get: dev-branch
-        resource: git-dev
-        trigger: true
-        passed: [cache-modules]
-      - get: node-cache
-        resource: npm-repo-cache
-        passed: [cache-modules]
+      - { get: dev-branch, resource: git-dev, trigger: true, passed: [cache-modules] }
+      - { get: node-cache, resource: npm-repo-cache, passed: [cache-modules] }
       - task: test
-        file: git-dev/ci/tasks/task-npm-install.yml
+        file: dev-branch/ci/tasks/task-npm-install.yml
 #        config:
 #          platform: linux
 #          image_resource:

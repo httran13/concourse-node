@@ -12,4 +12,4 @@ outputs:
   - name: sonarqube-analysis-input
 
 run:
-  path: git-dev/ci/scripts/sonarqube-input.sh
+  path: dev-branch/ci/scripts/sonarqube-input.sh
