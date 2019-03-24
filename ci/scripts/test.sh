@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-echo "hello from concourse node example"
-
-echo "running test"
-
-cd ../.. && npm test
+mv node-cache/node_modules dev-branch
+cd dev-branch
+npm run test

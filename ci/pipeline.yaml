@@ -12,29 +12,6 @@ jobs:
       - { get: node-cache, resource: npm-repo-cache, passed: [cache-modules] }
       - task: test
         file: dev-branch/ci/tasks/task-npm-install.yml
-#        config:
-#          platform: linux
-#          image_resource:
-#            type: docker-image #TODO env should reflect what is built by docker image
-#            source: {repository: yeasy/hyperledger-fabric-sdk-node, tag: "latest"}
-#          inputs:
-#            - name: git-dev
-#              path: /node-concourse
-#            - name: npm-repo-cache
-#              path: /cache
-#          outputs:
-#            - name: sonarqube-analysis-input
-#          run:
-#            path: sh
-#            args:
-#              - -exc
-#              - |
-#                mv cache/node_modules node-concourse
-#                cd node-concourse
-#                npm rebuild
-#                npm test
-#                perl -i -pe's|SF:.*/node-concourse/|SF:/tmp/build/put/sonarqube-analysis-input/|g' coverage/lcov.info
-#                cp -r . ../sonarqube-analysis-input
       - aggregate:
           - put: code-analysis
             params:

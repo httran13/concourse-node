@@ -1,0 +1,15 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source: {repository: yeasy/hyperledger-fabric-sdk-node, tag: "latest"}
+
+inputs:
+  - name: sonarqube-analysis-input
+  - name: dev-branch
+outputs:
+  - name: sonarqube-analysis-package
+
+run:
+  path: dev-branch/ci/scripts/sonarqube-process.sh

@@ -1,0 +1,103 @@
+---
+jobs:
+  - name: cache-modules
+    plan:
+      - get: git-dev
+        trigger: true
+      - get: npm-repo-cache
+  - name: test
+    serial: true
+    plan:
+      - { get: dev-branch, resource: git-dev, trigger: true, passed: [cache-modules] }
+      - { get: node-cache, resource: npm-repo-cache, passed: [cache-modules] }
+      - task: test
+        file: dev-branch/ci/tasks/task-test.yml
+      - task: package-sonar
+        file: dev-branch/ci/tasks/task-sonar-package.yml
+      - aggregate:
+          - put: sonar-code-coverage
+            params:
+              project_path: sonarqube-analysis-package
+              project_key: "node-dev-code-coverage"
+              sources: ["src", "app.js"]
+              scanner_type: auto
+              project_name: node-concourse-demo-cc
+              project_description: "Example node demo code coverage"
+              project_version: 0.0.1
+              branch_name: dev
+              tests: ["tests"]
+              additional_properties:
+                sonar.language: js
+                sonar.scm.provider: git
+                sonar.javascript.lcov.reportPaths: coverage/lcov.info
+          - put: sonar-code-quality
+            params:
+              project_path: sonarqube-analysis-package
+              project_key: "node-dev-code-quality"
+              sources: ["src", "app.js"]
+              scanner_type: auto
+              project_name: node-concourse-demo-cq
+              project_description: "Example node demo code coverage"
+              project_version: 0.0.1
+              branch_name: dev
+              tests: ["tests"]
+              additional_properties:
+                sonar.language: js
+                sonar.scm.provider: git
+                sonar.javascript.lcov.reportPaths: coverage/lcov.info
+  - name: code-coverage-gate
+    plan:
+      - { get: sonar-code-coverage, trigger: true, passed: [test] }
+      - { get: dev-branch, resource: git-dev, trigger: true, passed: [cache-modules] }
+      - task: check-sonarqube-code-coverage
+        file: dev-branch/ci/tasks/task-sonar-code-coverage.yml
+  - name: code-quality-gate
+    plan:
+      - { get: sonar-code-quality, trigger: true, passed: [test] }
+      - { get: dev-branch, resource: git-dev, trigger: true, passed: [cache-modules] }
+      - task: check-sonarqube-code-quality
+        file: dev-branch/ci/tasks/task-sonar-code-quality.yml
+  - name: merge-to-master
+    plan:
+      - { get: sonar-code-coverage, trigger: false, passed: [code-coverage-gate] }
+      - { get: sonar-code-quality, trigger: false, passed: [code-quality-gate] }
+      - { get: git-dev }
+      - { put: git-master, params: { repository: git-dev } }
+
+resource_types:
+  - name: npm-cache
+    type: docker-image
+    source: {repository: ymedlop/npm-cache-resource, tag: "8"}
+  - name: sonar-runner
+    type: docker-image
+    source: {repository: cathive/concourse-sonarqube-resource, tag: "0.8.1" }
+resources:
+  - name: sonar-code-coverage
+    type: sonar-runner
+    source:
+      host_url: "https://sonarcloud.io/"
+      login: ((sonar-dev-cc))
+      organization: huy-demo
+  - name: sonar-code-quality
+    type: sonar-runner
+    source:
+      host_url: "https://sonarcloud.io/"
+      login: ((sonar-dev-cq))
+      organization: huy-demo
+  - name: git-master
+    type: git
+    source:
+      branch: master
+      uri: https://httran13:((github-token))@github.com/httran13/concourse-node.git
+  - name: git-dev
+    type: git
+    source: &repo-source
+      branch: dev
+      uri: https://httran13:((github-token))@github.com/httran13/concourse-node.git
+  - name: npm-repo-cache
+    type: npm-cache
+    source:
+      yarn-support: true
+      <<: *repo-source
+      paths:
+        - package.json
