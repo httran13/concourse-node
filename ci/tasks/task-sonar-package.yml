@@ -9,7 +9,7 @@ inputs:
   - name: sonarqube-analysis-input
   - name: dev-branch
 outputs:
-  - name: sonarqube-analysis-package
+  - name: sonarqube-analysis-input
 
 run:
   path: dev-branch/ci/scripts/sonarqube-process.sh

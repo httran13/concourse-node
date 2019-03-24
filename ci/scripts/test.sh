@@ -3,3 +3,4 @@
 mv node-cache/node_modules dev-branch
 cd dev-branch
 npm run test
+cp -r . ../sonarqube-analysis-input

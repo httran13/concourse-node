@@ -17,7 +17,7 @@ jobs:
       - aggregate:
           - put: sonar-code-coverage
             params:
-              project_path: sonarqube-analysis-package
+              project_path: sonarqube-analysis-input
               project_key: "node-dev-code-coverage"
               sources: ["src", "app.js"]
               scanner_type: auto
@@ -32,7 +32,7 @@ jobs:
                 sonar.javascript.lcov.reportPaths: coverage/lcov.info
           - put: sonar-code-quality
             params:
-              project_path: sonarqube-analysis-package
+              project_path: sonarqube-analysis-input
               project_key: "node-dev-code-quality"
               sources: ["src", "app.js"]
               scanner_type: auto
