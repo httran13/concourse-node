@@ -46,6 +46,7 @@ function checkLengthFor7(str){
 //   let c = a + b
 //   return c
 // }
+// module.exports = {checkLengthFor7, generateUser, newFeature}
 
-module.exports = {checkLengthFor7, generateUser, newFeature}
-// module.exports = {checkLengthFor7, generateUser}
+
+module.exports = {checkLengthFor7, generateUser}
