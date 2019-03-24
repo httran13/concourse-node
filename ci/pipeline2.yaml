@@ -48,7 +48,7 @@ jobs:
   - name: code-coverage-gate
     plan:
       - { get: sonar-code-coverage, trigger: true, passed: [test] }
-      - { get: dev-branch, resource: git-dev, trigger: true, passed: [cache-modules] }
+#      - { get: dev-branch, resource: git-dev, trigger: true, passed: [cache-modules] }
       - task: check-sonarqube-code-coverage
 #        file: dev-branch/ci/tasks/task-sonar-code-coverage.yml
         config:
@@ -62,7 +62,7 @@ jobs:
   - name: code-quality-gate
     plan:
       - { get: sonar-code-quality, trigger: true, passed: [test] }
-      - { get: dev-branch, resource: git-dev, trigger: true, passed: [cache-modules] }
+#      - { get: dev-branch, resource: git-dev, trigger: true, passed: [cache-modules] }
       - task: check-sonarqube-code-quality
 #        file: dev-branch/ci/tasks/task-sonar-code-quality.yml
         config:
@@ -71,14 +71,14 @@ jobs:
             type: docker-image
             source: {repository: cathive/concourse-sonarqube-qualitygate-task, tag: latest }
           inputs:
-            - name: sonar-code-coverage
-          run: { path: /sonarqube-qualitygate-check, dir: sonar-code-coverage }
+            - name: sonar-code-quality
+          run: { path: /sonarqube-qualitygate-check, dir: sonar-code-quality }
 
   - name: merge-to-master
     plan:
       - { get: sonar-code-coverage, trigger: false, passed: [code-coverage-gate] }
       - { get: sonar-code-quality, trigger: false, passed: [code-quality-gate] }
-      - { get: git-dev , trigger: false, passed: [code-coverage-gate,code-quality-gate]}
+      - { get: git-dev , trigger: false, passed: [test]}
       - { put: git-master, params: { repository: git-dev } }
 
 resource_types:
