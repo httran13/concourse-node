@@ -2,3 +2,4 @@
 
 cd sonarqube-analysis-input
 perl -i -pe's|SF:.*/dev-branch/|SF:/tmp/build/put/sonarqube-analysis-package/|g' coverage/lcov.info
+cp -r . ../sonarqube-analysis-package
