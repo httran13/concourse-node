@@ -5,9 +5,32 @@ jobs:
       - get: git-dev
         trigger: true
       - get: npm-repo-cache
+      - task: save-last-commit
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: alpine/git, tag: latest}
+          inputs:
+            - name: git-dev
+          outputs:
+            - name: keyvalout
+          run:
+            path: sh
+            args:
+              - -exc
+              - |
+                touch ./keyvalout/keyval.properties
+                cd git-dev
+                git reflog | grep HEAD@{1} | awk '{print "PASSED_COMMIT=""\x27"$1"\x27"}' > ../keyvalout/keyval.properties
+                cat ../keyvalout/keyval.properties
+      - put: keyval
+        params:
+          file: keyvalout/keyval.properties
   - name: test
     serial: true
     plan:
+      - { get: keyval, passed: [cache-modules] }
       - { get: dev-branch, resource: git-dev, trigger: true, passed: [cache-modules] }
       - { get: node-cache, resource: npm-repo-cache, passed: [cache-modules] }
       - task: test
@@ -84,7 +107,13 @@ resource_types:
   - name: sonar-runner
     type: docker-image
     source: {repository: cathive/concourse-sonarqube-resource, tag: "0.8.1" }
+  - name: keyval
+    type: docker-image
+    source:
+      repository: swce/keyval-resource
 resources:
+  - name: keyval
+    type: keyval
   - name: sonar-code-coverage
     type: sonar-runner
     source:
