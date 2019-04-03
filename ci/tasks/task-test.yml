@@ -8,6 +8,7 @@ image_resource:
 inputs:
   - name: dev-branch
   - name: node-cache
+  - name: keyval
 outputs:
   - name: sonarqube-analysis-input
 
