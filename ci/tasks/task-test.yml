@@ -11,6 +11,5 @@ inputs:
   - name: keyval
 outputs:
   - name: sonarqube-analysis-input
-
 run:
   path: dev-branch/ci/scripts/test.sh

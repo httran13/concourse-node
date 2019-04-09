@@ -1,0 +1,78 @@
+---
+resource_types:
+  - name: keyval
+    type: docker-image
+    source:
+      repository: swce/keyval-resource
+
+resources:
+  - name: repo
+    type: git
+    source:
+      uri: https://github.com/starkandwayne/concourse-tutorial.git
+      branch: develop
+  - name: cloudfoundry
+    type: keyval
+
+jobs:
+  - name: build
+    plan:
+      - get: repo
+      - task: build
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: busybox, tag: latest}
+          inputs:
+            - name: repo
+          run:
+            path: sh
+            args:
+              - -exc
+              - |
+                echo "hi this is dummy"
+  - name: test
+    plan:
+      - get: repo
+        passed: [build]
+        trigger: true
+      - task: build
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: busybox, tag: latest}
+          inputs:
+            - name: repo
+          run:
+            path: sh
+            args:
+              - -exc
+              - |
+                echo hi this is dummy
+  - name: deploy
+    plan:
+      - get: repo
+        passed: [test]
+        trigger: true
+      - task: build
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: busybox, tag: latest}
+          inputs:
+            - name: repo
+          outputs:
+            - name: output
+          run:
+            path: sh
+            args:
+              - -exc
+              - |
+                touch ./output/keyval.properties
+                echo hi > ./output/keyval.properties
+      - put: cloudfoundry
+        params:
+          file: output/keyval.properties

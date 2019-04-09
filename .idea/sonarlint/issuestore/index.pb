@@ -44,3 +44,5 @@ U
 %ci/tasks/task-sonar-code-coverage.yml,1/c/1c712e63db1b7a4b4866782d5426b3599bda103b
 A
 ci/pipeline2.yaml,8/3/839fd6895d82ad9d37d329ea679eaa70150a02fa
+7
+ci_temp,7/c/7c59126f90e55c658e85f6087178aa1173166394
