@@ -97,6 +97,24 @@ jobs:
     plan:
       - { get: sonar-code-coverage, trigger: false, passed: [code-coverage-gate] }
       - { get: sonar-code-quality, trigger: false, passed: [code-quality-gate] }
+      - task: check-sonarqube-code-quality
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: cathive/concourse-sonarqube-qualitygate-task, tag: latest }
+          inputs:
+            - name: sonar-code-quality
+          run: { path: /sonarqube-qualitygate-check, dir: sonar-code-quality }
+      - task: check-sonarqube-code-coverage
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: cathive/concourse-sonarqube-qualitygate-task,tag: latest }
+          inputs:
+            - name: sonar-code-coverage
+          run: { path: /sonarqube-qualitygate-check, dir: sonar-code-coverage }
       - { get: git-dev , trigger: false, passed: [test]}
       - { put: git-master, params: { repository: git-dev, merge: true } }
 
