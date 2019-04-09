@@ -95,9 +95,9 @@ jobs:
 
   - name: merge-to-master
     plan:
-      - { get: sonar-code-coverage, trigger: true, passed: [code-coverage-gate] }
-      - { get: sonar-code-quality, trigger: true, passed: [code-quality-gate] }
-      - { get: git-dev , trigger: true, passed: [test]}
+      - { get: sonar-code-coverage, trigger: false, passed: [code-coverage-gate] }
+      - { get: sonar-code-quality, trigger: false, passed: [code-quality-gate] }
+      - { get: git-dev , trigger: false, passed: [test]}
       - { put: git-master, params: { repository: git-dev, merge: true } }
 
 resource_types:
