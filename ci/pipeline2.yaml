@@ -99,8 +99,8 @@ jobs:
             type: docker-image
             source: {repository: cathive/concourse-sonarqube-qualitygate-task,tag: latest }
           inputs:
-            - name: sonar-code-coverage
-          run: { path: /sonarqube-qualitygate-check, dir: sonar-code-coverage }
+            - name: sonar-code-coverage-95
+          run: { path: /sonarqube-qualitygate-check, dir: sonar-code-coverage-95 }
   - name: code-quality-gate-codesmell-2
     plan:
       - { get: sonar-code-quality-codesmell-2, trigger: true, passed: [test] }
@@ -111,8 +111,8 @@ jobs:
             type: docker-image
             source: {repository: cathive/concourse-sonarqube-qualitygate-task, tag: latest }
           inputs:
-            - name: sonar-code-quality
-          run: { path: /sonarqube-qualitygate-check, dir: sonar-code-quality }
+            - name: sonar-code-quality-codesmell-2
+          run: { path: /sonarqube-qualitygate-check, dir: sonar-code-quality-codesmell-2 }
   - name: "code-coverage-gate-80%"
     plan:
       - { get: sonar-code-coverage-80, trigger: true, passed: [test] }
@@ -123,8 +123,8 @@ jobs:
             type: docker-image
             source: {repository: cathive/concourse-sonarqube-qualitygate-task,tag: latest }
           inputs:
-            - name: sonar-code-coverage
-          run: { path: /sonarqube-qualitygate-check, dir: sonar-code-coverage }
+            - name: sonar-code-coverage-80
+          run: { path: /sonarqube-qualitygate-check, dir: sonar-code-coverage-80 }
   - name: code-quality-gate-codesmell-1
     plan:
       - { get: sonar-code-quality-codesmell-1, trigger: true, passed: [test] }
@@ -135,8 +135,8 @@ jobs:
             type: docker-image
             source: {repository: cathive/concourse-sonarqube-qualitygate-task, tag: latest }
           inputs:
-            - name: sonar-code-quality
-          run: { path: /sonarqube-qualitygate-check, dir: sonar-code-quality }
+            - name: sonar-code-quality-codesmell-1
+          run: { path: /sonarqube-qualitygate-check, dir: sonar-code-quality-codesmell-1 }
   - name: merge-to-master
     plan:
       - { get: sonar-code-coverage-80, trigger: false, passed: ["code-coverage-gate-80%"] }
