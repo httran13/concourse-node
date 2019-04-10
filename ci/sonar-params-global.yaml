@@ -1,12 +1,11 @@
-
-  project_path: sonarqube-analysis-package
-  sources: ["src", "app.js"]
-  scanner_type: auto
-  project_description: "Example node demo code coverage"
-  project_version: 0.0.1
-  branch_name: dev
-  tests: ["tests"]
-  additional_properties:
-    sonar.language: js
-    sonar.scm.provider: git
-    sonar.javascript.lcov.reportPaths: coverage/lcov.info
+project_path: sonarqube-analysis-package
+sources: ["src", "app.js"]
+scanner_type: auto
+project_description: "Example node demo code coverage"
+project_version: 0.0.1
+branch_name: dev
+tests: ["tests"]
+additional_properties:
+  sonar.language: js
+  sonar.scm.provider: git
+  sonar.javascript.lcov.reportPaths: coverage/lcov.info
