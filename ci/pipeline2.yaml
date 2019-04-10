@@ -38,39 +38,30 @@ jobs:
       - task: package-sonar
         file: dev-branch/ci/tasks/task-sonar-package.yml
       - aggregate:
-          - put: sonar-code-coverage
+          - put: sonar-code-coverage-95
             params:
-              project_path: sonarqube-analysis-package
+              file: dev-branch/ci/sonar-params-global.yaml
               project_key: "node-dev-code-coverage"
-              sources: ["src", "app.js"]
-              scanner_type: auto
               project_name: node-concourse-demo-cc
-              project_description: "Example node demo code coverage"
-              project_version: 0.0.1
-              branch_name: dev
-              tests: ["tests"]
-              additional_properties:
-                sonar.language: js
-                sonar.scm.provider: git
-                sonar.javascript.lcov.reportPaths: coverage/lcov.info
-          - put: sonar-code-quality
+          - put: sonar-code-quality-codesmell-2
             params:
-              project_path: sonarqube-analysis-package
+              file: dev-branch/ci/sonar-params-global.yaml
               project_key: "node-dev-code-quality"
-              sources: ["src", "app.js"]
-              scanner_type: auto
               project_name: node-concourse-demo-cq
-              project_description: "Example node demo code coverage"
-              project_version: 0.0.1
-              branch_name: dev
-              tests: ["tests"]
-              additional_properties:
-                sonar.language: js
-                sonar.scm.provider: git
-                sonar.javascript.lcov.reportPaths: coverage/lcov.info
-  - name: code-coverage-gate
+          - put: sonar-code-coverage-80
+            params:
+              file: dev-branch/ci/sonar-params-global.yaml
+              project_key: "node-dev-code-coverage-80"
+              project_name: node-dev-code-coverage-80
+          - put: sonar-code-quality-codesmell-1
+            params:
+              file: dev-branch/ci/sonar-params-global.yaml
+              project_key: "node-dev-code-quality-zero"
+              project_name: node-dev-code-quality-zero
+
+  - name: "code-coverage-gate-95%"
     plan:
-      - { get: sonar-code-coverage, trigger: true, passed: [test] }
+      - { get: sonar-code-coverage-95, trigger: true, passed: [test] }
       - task: check-sonarqube-code-coverage
         config:
           platform: linux
@@ -80,9 +71,9 @@ jobs:
           inputs:
             - name: sonar-code-coverage
           run: { path: /sonarqube-qualitygate-check, dir: sonar-code-coverage }
-  - name: code-quality-gate
+  - name: code-quality-gate-codesmell-2
     plan:
-      - { get: sonar-code-quality, trigger: true, passed: [test] }
+      - { get: sonar-code-quality-codesmell-2, trigger: true, passed: [test] }
       - task: check-sonarqube-code-quality
         config:
           platform: linux
@@ -92,20 +83,9 @@ jobs:
           inputs:
             - name: sonar-code-quality
           run: { path: /sonarqube-qualitygate-check, dir: sonar-code-quality }
-
-  - name: merge-to-master
+  - name: "code-coverage-gate-80%"
     plan:
-      - { get: sonar-code-coverage, trigger: false, passed: [code-coverage-gate] }
-      - { get: sonar-code-quality, trigger: false, passed: [code-quality-gate] }
-      - task: check-sonarqube-code-quality
-        config:
-          platform: linux
-          image_resource:
-            type: docker-image
-            source: {repository: cathive/concourse-sonarqube-qualitygate-task, tag: latest }
-          inputs:
-            - name: sonar-code-quality
-          run: { path: /sonarqube-qualitygate-check, dir: sonar-code-quality }
+      - { get: sonar-code-coverage-80, trigger: true, passed: [test] }
       - task: check-sonarqube-code-coverage
         config:
           platform: linux
@@ -114,6 +94,60 @@ jobs:
             source: {repository: cathive/concourse-sonarqube-qualitygate-task,tag: latest }
           inputs:
             - name: sonar-code-coverage
+          run: { path: /sonarqube-qualitygate-check, dir: sonar-code-coverage }
+  - name: code-quality-gate-codesmell-1
+    plan:
+      - { get: sonar-code-quality-codesmell-1, trigger: true, passed: [test] }
+      - task: check-sonarqube-code-quality
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: cathive/concourse-sonarqube-qualitygate-task, tag: latest }
+          inputs:
+            - name: sonar-code-quality
+          run: { path: /sonarqube-qualitygate-check, dir: sonar-code-quality }
+  - name: merge-to-master
+    plan:
+      - { get: sonar-code-coverage-80, trigger: false, passed: ["code-coverage-gate-80%"] }
+      - { get: sonar-code-quality-codesmell-2, trigger: false, passed: [code-quality-gate-codesmell-2] }
+      - { get: sonar-code-coverage-95, trigger: false, passed: ["code-coverage-gate-95%"] }
+      - { get: sonar-code-quality-codesmell-1, trigger: false, passed: [code-quality-gate-codesmell-1] }
+      - task: check-sonarqube-code-quality-2
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: cathive/concourse-sonarqube-qualitygate-task, tag: latest }
+          inputs:
+            - name: sonar-code-quality-codesmell-2
+          run: { path: /sonarqube-qualitygate-check, dir: sonar-code-quality }
+      - task: check-sonarqube-code-coverage-95
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: cathive/concourse-sonarqube-qualitygate-task,tag: latest }
+          inputs:
+            - name: sonar-code-coverage-95
+          run: { path: /sonarqube-qualitygate-check, dir: sonar-code-coverage }
+      - task: check-sonarqube-code-quality-1
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: cathive/concourse-sonarqube-qualitygate-task, tag: latest }
+          inputs:
+            - name: sonar-code-quality-codesmell-1
+          run: { path: /sonarqube-qualitygate-check, dir: sonar-code-quality }
+      - task: check-sonarqube-code-coverage-80
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: cathive/concourse-sonarqube-qualitygate-task,tag: latest }
+          inputs:
+            - name: sonar-code-coverage-80
           run: { path: /sonarqube-qualitygate-check, dir: sonar-code-coverage }
       - { get: git-dev , trigger: false, passed: [test]}
       - { put: git-master, params: { repository: git-dev, merge: true } }
@@ -132,17 +166,29 @@ resource_types:
 resources:
   - name: keyval
     type: keyval
-  - name: sonar-code-coverage
+  - name: sonar-code-coverage-95
     type: sonar-runner
     source:
       host_url: "https://sonarcloud.io/"
       login: ((sonar-dev-cc))
       organization: huy-demo
-  - name: sonar-code-quality
+  - name: sonar-code-quality-codesmell-2
     type: sonar-runner
     source:
       host_url: "https://sonarcloud.io/"
       login: ((sonar-dev-cq))
+      organization: huy-demo
+  - name: sonar-code-coverage-80
+    type: sonar-runner
+    source:
+      host_url: "https://sonarcloud.io/"
+      login: ((sonar-dev-cc-80))
+      organization: huy-demo
+  - name: sonar-code-quality-codesmell-1
+    type: sonar-runner
+    source:
+      host_url: "https://sonarcloud.io/"
+      login: ((sonar-dev-cq-zero))
       organization: huy-demo
   - name: git-master
     type: git
