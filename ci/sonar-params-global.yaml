@@ -1,4 +1,4 @@
-params:
+
   project_path: sonarqube-analysis-package
   sources: ["src", "app.js"]
   scanner_type: auto

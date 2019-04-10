@@ -40,22 +40,22 @@ jobs:
       - aggregate:
           - put: sonar-code-coverage-95
             params:
-              file: dev-branch/ci/sonar-params-global.yaml
+              additional_properties_file: dev-branch/ci/sonar-params-global.yaml
               project_key: "node-dev-code-coverage"
               project_name: node-concourse-demo-cc
           - put: sonar-code-quality-codesmell-2
             params:
-              file: dev-branch/ci/sonar-params-global.yaml
+              additional_properties_file: dev-branch/ci/sonar-params-global.yaml
               project_key: "node-dev-code-quality"
               project_name: node-concourse-demo-cq
           - put: sonar-code-coverage-80
             params:
-              file: dev-branch/ci/sonar-params-global.yaml
+              additional_properties_file: dev-branch/ci/sonar-params-global.yaml
               project_key: "node-dev-code-coverage-80"
               project_name: node-dev-code-coverage-80
           - put: sonar-code-quality-codesmell-1
             params:
-              file: dev-branch/ci/sonar-params-global.yaml
+              additional_properties_file: dev-branch/ci/sonar-params-global.yaml
               project_key: "node-dev-code-quality-zero"
               project_name: node-dev-code-quality-zero
 
