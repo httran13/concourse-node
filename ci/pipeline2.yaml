@@ -49,7 +49,7 @@ jobs:
               project_version: 0.0.1
               branch_name: dev
               tests: ["tests"]
-              additional_properties: &sonar-add-prop
+              additional_properties:
                 sonar.language: js
                 sonar.scm.provider: git
                 sonar.javascript.lcov.reportPaths: coverage/lcov.info
@@ -64,7 +64,10 @@ jobs:
               project_version: 0.0.1
               branch_name: dev
               tests: ["tests"]
-              <<: *sonar-add-prop
+              additional_properties:
+                sonar.language: js
+                sonar.scm.provider: git
+                sonar.javascript.lcov.reportPaths: coverage/lcov.info
           - put: sonar-code-coverage-80
             params:
               project_key: "node-dev-code-coverage-80"
@@ -76,7 +79,10 @@ jobs:
               project_version: 0.0.1
               branch_name: dev
               tests: ["tests"]
-              <<: *sonar-add-prop
+              additional_properties:
+                sonar.language: js
+                sonar.scm.provider: git
+                sonar.javascript.lcov.reportPaths: coverage/lcov.info
           - put: sonar-code-quality-codesmell-1
             params:
               project_key: "node-dev-code-quality-zero"
@@ -88,7 +94,10 @@ jobs:
               project_version: 0.0.1
               branch_name: dev
               tests: ["tests"]
-              <<: *sonar-add-prop
+              additional_properties:
+                sonar.language: js
+                sonar.scm.provider: git
+                sonar.javascript.lcov.reportPaths: coverage/lcov.info
   - name: "code-coverage-gate-95%"
     plan:
       - { get: sonar-code-coverage-95, trigger: true, passed: [test] }
