@@ -25,14 +25,14 @@ function checkLengthFor7(str){
 /**
  *  Added functionalities below
  * **/
-module.exports.newFeature = function(){
+function newFeature(){
   let a = 0
   let b = 5
   let str1 = random.generate()
   let str2 = random.generate()
 
   //TODO add let to pass cq
-  for (i = 0; i < 4; i++){
+  for (let i = 0; i < 4; i++){
     str1 = str1 + (a + i)
     str2 = str2 + (b * i)
   }
@@ -49,4 +49,6 @@ function someUseFulNewFunc(){
   return c
 }
 
-module.exports = {checkLengthFor7, generateUser}
+module.exports = {checkLengthFor7, generateUser, newFeature}
+
+// module.exports = {checkLengthFor7, generateUser}
