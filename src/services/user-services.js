@@ -32,7 +32,7 @@ module.exports.newFeature = function(){
   let str2 = random.generate()
 
   //TODO add let to pass cq
-  for (let i = 0; i < 4; i++){
+  for (i = 0; i < 4; i++){
     str1 = str1 + (a + i)
     str2 = str2 + (b * i)
   }
