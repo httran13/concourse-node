@@ -44,7 +44,7 @@ describe('Test users', function(){
   /**
    *  Tests for added functionalities
    * **/
-  it.skip('#Test the new feature', function(done){
+  it('#Test the new feature', function(done){
     request(app)
         .post('/users/newfeature')
         .send({user:"huy"})
