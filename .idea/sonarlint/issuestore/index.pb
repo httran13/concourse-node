@@ -22,8 +22,6 @@ M
 src/services/user-services.js,5/7/577104d4902f353a022022eb3c70eb01254e869e
 B
 tests/test.test.js,f/5/f589edbde8319451f5aab5156ac1d3a4937a7ede
-K
-ci/pipeline_deprecated.yaml,5/9/596e309c2af098ba35e5841cb06a36da92e84bc1
 @
 ci/gated-ex.yaml,8/c/8c524aa7ae881943072254d016cf0a3ed7944c30
 M
@@ -40,9 +38,13 @@ K
 ci/resources/resources.yaml,9/e/9e9540a84e8aec9bbb4d345347acfb9338e1921d
 T
 $ci/tasks/task-sonar-code-quality.yml,c/c/ccbd966db2558a27470c041380082078662ca11f
-U
-%ci/tasks/task-sonar-code-coverage.yml,1/c/1c712e63db1b7a4b4866782d5426b3599bda103b
 A
 ci/pipeline2.yaml,8/3/839fd6895d82ad9d37d329ea679eaa70150a02fa
 7
 ci_temp,7/c/7c59126f90e55c658e85f6087178aa1173166394
+N
+ci/ex_pipeline/ex1_simple.yaml,a/2/a26de4fd54dba0a79fdf0a3f0bc954b91c5ec993
+@
+ci/sonar-ex.yaml,8/9/89adf23a02de2e05976cb7a434cf58cfe97762a6
+K
+ci/sonar-params-global.yaml,c/f/cff4d81492be434d5d713bf1ee32ee6a80153872
