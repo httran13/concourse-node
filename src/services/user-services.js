@@ -3,7 +3,7 @@ let random = require('randomstring')
 
 function generateUser(num){
   let randomObjects = [];
-  for(let i = 0; i < num; i++){
+  for(i = 0; i < num; i++){
     if(i % 2 === 0){
       randomObjects.push({name: random.generate(7)})
     }else{
