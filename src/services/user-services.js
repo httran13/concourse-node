@@ -15,14 +15,14 @@ function generateUser(num){
 
 function checkLengthFor7(str){
   //TODO Code Smell Non-Compliant
-  // if(str.length === 7){
-  //   return true
-  // }else{
-  //   return false
-  // }
+  if(str.length === 7){
+    return true
+  }else{
+    return false
+  }
 
   //TODO
-  return str.length === 7
+  // return str.length === 7
 }
 
 /**
@@ -35,7 +35,7 @@ function newFeature(){
   let str2 = random.generate()
 
   //TODO add let to pass cq
-  for (let i = 0; i < 4; i++){
+  for (i = 0; i < 4; i++){
     str1 = str1 + (a + i)
     str2 = str2 + (b * i)
   }
