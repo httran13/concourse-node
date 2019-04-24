@@ -14,11 +14,14 @@ function generateUser(num){
 }
 
 function checkLengthFor7(str){
+  //TODO Code Smell Non-Compliant
   // if(str.length === 7){
   //   return true
   // }else{
   //   return false
   // }
+
+  //TODO
   return str.length === 7
 }
 
