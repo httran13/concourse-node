@@ -40,14 +40,14 @@ jobs:
       - aggregate:
           - put: sonar-code-coverage-95
             params: &sonar-params
-              project_key: "node-concourse-demo3-cc-95" #TODO
-              project_name: node-concourse-demo3-cc-95 #TODO
+              project_key: "node-concourse-demo2-cc-95" #TODO
+              project_name: node-concourse-demo2-cc-95 #TODO
               project_path: sonarqube-analysis-package
               sources: ["src", "app.js"]
               scanner_type: auto
               project_description: "Example node demo code coverage"
               project_version: 0.0.1
-              branch_name: dev #TODO
+              branch_name: fail #TODO
               tests: ["tests"]
               additional_properties:
                 sonar.language: js
@@ -55,14 +55,14 @@ jobs:
                 sonar.javascript.lcov.reportPaths: coverage/lcov.info
           - put: sonar-code-quality-codesmell-2
             params:
-              project_key: "node-concourse-demo3-cs-2" #TODO
-              project_name: node-concourse-demo3-cs-2 #TODO
+              project_key: "node-concourse-demo2-cs-2" #TODO
+              project_name: node-concourse-demo2-cs-2 #TODO
               project_path: sonarqube-analysis-package
               sources: ["src", "app.js"]
               scanner_type: auto
               project_description: "Example node demo code coverage"
               project_version: 0.0.1
-              branch_name: dev #TODO
+              branch_name: fail #TODO
               tests: ["tests"]
               additional_properties:
                 sonar.language: js
@@ -70,14 +70,14 @@ jobs:
                 sonar.javascript.lcov.reportPaths: coverage/lcov.info
           - put: sonar-code-coverage-75
             params:
-              project_key: "node-concourse-demo3-cc-75" #TODO
-              project_name: node-concourse-demo3-cc-75 #TODO
+              project_key: "node-concourse-demo2-cc-75" #TODO
+              project_name: node-concourse-demo2-cc-75 #TODO
               project_path: sonarqube-analysis-package
               sources: ["src", "app.js"]
               scanner_type: auto
               project_description: "Example node demo code coverage"
               project_version: 0.0.1
-              branch_name: dev #TODO
+              branch_name: fail #TODO
               tests: ["tests"]
               additional_properties:
                 sonar.language: js
@@ -85,14 +85,14 @@ jobs:
                 sonar.javascript.lcov.reportPaths: coverage/lcov.info
           - put: sonar-code-quality-codesmell-1
             params:
-              project_key: "node-concourse-demo3-cs-1" #TODO
-              project_name: node-concourse-demo3-cs-1 #TODO
+              project_key: "node-concourse-demo2-cs-1" #TODO
+              project_name: node-concourse-demo2-cs-1 #TODO
               project_path: sonarqube-analysis-package
               sources: ["src", "app.js"]
               scanner_type: auto
               project_description: "Example node demo code coverage"
               project_version: 0.0.1
-              branch_name: dev #TODO
+              branch_name: fail #TODO
               tests: ["tests"]
               additional_properties:
                 sonar.language: js
@@ -237,7 +237,7 @@ resources:
   - name: git-dev
     type: git
     source: &repo-source
-      branch: dev
+      branch: fail
       uri: https://httran13:((git-token))@github.com/httran13/concourse-node.git
   - name: npm-repo-cache
     type: npm-cache
