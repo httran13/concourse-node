@@ -34,6 +34,7 @@ function newFeature(){
   let str1 = random.generate()
   let str2 = random.generate()
 
+
   //TODO add let to pass cq
   for (i = 0; i < 4; i++){
     str1 = str1 + (a + i)
