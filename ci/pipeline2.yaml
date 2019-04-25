@@ -40,14 +40,14 @@ jobs:
       - aggregate:
           - put: sonar-code-coverage-95
             params: &sonar-params
-              project_key: "node-dev-code-coverage"
-              project_name: node-concourse-demo-cc
+              project_key: "node-concourse-demo3-cc-95" #TODO
+              project_name: node-concourse-demo3-cc-95 #TODO
               project_path: sonarqube-analysis-package
               sources: ["src", "app.js"]
               scanner_type: auto
               project_description: "Example node demo code coverage"
               project_version: 0.0.1
-              branch_name: dev
+              branch_name: dev #TODO
               tests: ["tests"]
               additional_properties:
                 sonar.language: js
@@ -55,14 +55,14 @@ jobs:
                 sonar.javascript.lcov.reportPaths: coverage/lcov.info
           - put: sonar-code-quality-codesmell-2
             params:
-              project_key: "node-dev-code-quality"
-              project_name: node-concourse-demo-cq
+              project_key: "node-concourse-demo3-cs-2" #TODO
+              project_name: node-concourse-demo3-cs-2 #TODO
               project_path: sonarqube-analysis-package
               sources: ["src", "app.js"]
               scanner_type: auto
               project_description: "Example node demo code coverage"
               project_version: 0.0.1
-              branch_name: dev
+              branch_name: dev #TODO
               tests: ["tests"]
               additional_properties:
                 sonar.language: js
@@ -70,14 +70,14 @@ jobs:
                 sonar.javascript.lcov.reportPaths: coverage/lcov.info
           - put: sonar-code-coverage-75
             params:
-              project_key: "node-dev-code-coverage-80"
-              project_name: node-dev-code-coverage-80
+              project_key: "node-concourse-demo3-cc-75" #TODO
+              project_name: node-concourse-demo3-cc-75 #TODO
               project_path: sonarqube-analysis-package
               sources: ["src", "app.js"]
               scanner_type: auto
               project_description: "Example node demo code coverage"
               project_version: 0.0.1
-              branch_name: dev
+              branch_name: dev #TODO
               tests: ["tests"]
               additional_properties:
                 sonar.language: js
@@ -85,14 +85,14 @@ jobs:
                 sonar.javascript.lcov.reportPaths: coverage/lcov.info
           - put: sonar-code-quality-codesmell-1
             params:
-              project_key: "node-dev-code-quality-zero"
-              project_name: node-dev-code-quality-zero
+              project_key: "node-concourse-demo3-cs-1" #TODO
+              project_name: node-concourse-demo3-cs-1 #TODO
               project_path: sonarqube-analysis-package
               sources: ["src", "app.js"]
               scanner_type: auto
               project_description: "Example node demo code coverage"
               project_version: 0.0.1
-              branch_name: dev
+              branch_name: dev #TODO
               tests: ["tests"]
               additional_properties:
                 sonar.language: js
@@ -209,36 +209,36 @@ resources:
     type: sonar-runner
     source:
       host_url: "https://sonarcloud.io/"
-      login: ((sonar-dev-cc))
+      login: ((sonar-tok))
       organization: huy-demo
   - name: sonar-code-quality-codesmell-2
     type: sonar-runner
     source:
       host_url: "https://sonarcloud.io/"
-      login: ((sonar-dev-cq))
+      login: ((sonar-tok))
       organization: huy-demo
   - name: sonar-code-coverage-75
     type: sonar-runner
     source:
       host_url: "https://sonarcloud.io/"
-      login: ((sonar-dev-cc-80))
+      login: ((sonar-tok))
       organization: huy-demo
   - name: sonar-code-quality-codesmell-1
     type: sonar-runner
     source:
       host_url: "https://sonarcloud.io/"
-      login: ((sonar-dev-cq-zero))
+      login: ((sonar-tok))
       organization: huy-demo
   - name: git-master
     type: git
     source:
       branch: master
-      uri: https://httran13:((github-token))@github.com/httran13/concourse-node.git
+      uri: https://httran13:((git-token))@github.com/httran13/concourse-node.git
   - name: git-dev
     type: git
     source: &repo-source
       branch: dev
-      uri: https://httran13:((github-token))@github.com/httran13/concourse-node.git
+      uri: https://httran13:((git-token))@github.com/httran13/concourse-node.git
   - name: npm-repo-cache
     type: npm-cache
     source:
